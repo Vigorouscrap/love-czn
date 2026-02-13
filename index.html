@@ -21,6 +21,13 @@
             align-items: center;
             overflow: hidden;
             position: relative;
+            /* 修复频闪：优化渲染性能 */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-perspective: 1000;
+            perspective: 1000;
         }
 
         .magic-stage {
@@ -39,6 +46,11 @@
             z-index: 50;
             animation: lovely-beat 1.3s infinite cubic-bezier(0.5, 0.1, 0.3, 1.5);
             transform-origin: center;
+            /* 修复频闪：强制GPU加速 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
 
         .real-heart {
@@ -50,9 +62,11 @@
             width: 100%;
             height: 100%;
             filter: drop-shadow(0 15px 25px rgba(255, 170, 180, 0.35));
+            /* 修复频闪：优化滤镜性能 */
+            will-change: filter;
         }
 
-        /* 心跳动画 */
+        /* 心跳动画 - 优化性能，减少重绘 */
         @keyframes lovely-beat {
             0% { transform: scale(1); }
             15% { transform: scale(1.12); }
@@ -84,6 +98,9 @@
             white-space: nowrap;
             filter: drop-shadow(0 0 8px #ffc2b3);
             opacity: 0.9;
+            /* 修复频闪：星星也开启硬件加速 */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .star-small {
@@ -102,7 +119,7 @@
             100% { transform: translateY(-20px) scale(1.2); opacity: 1; text-shadow: 0 0 35px #ffe8cf, 0 0 80px #ffa7aa; }
         }
 
-        /* ---------- 白色弹幕（无重叠优化版） ---------- */
+        /* ---------- 弹幕 - 降低密度，优化重叠 ---------- */
         .danmaku-screen {
             position: absolute;
             top: 0;
@@ -134,18 +151,22 @@
             pointer-events: none;
             transform: translateX(100vw);
             animation-fill-mode: forwards;
+            /* 修复频闪：弹幕开启硬件加速 */
+            -webkit-transform: translateX(100vw) translateZ(0);
+            transform: translateX(100vw) translateZ(0);
+            will-change: transform;
         }
 
-        .danmaku.slow { animation-duration: 28s; font-size: 20px; }
-        .danmaku.medium { animation-duration: 20s; font-size: 26px; }
-        .danmaku.fast { animation-duration: 15s; font-size: 18px; }
-        .danmaku.xlarge { font-size: 32px; animation-duration: 35s; background: rgba(255, 235, 225, 0.15); border: none; }
+        .danmaku.slow { animation-duration: 30s; font-size: 20px; }  /* 速度放慢 */
+        .danmaku.medium { animation-duration: 22s; font-size: 24px; }
+        .danmaku.fast { animation-duration: 16s; font-size: 18px; }
+        .danmaku.xlarge { font-size: 30px; animation-duration: 38s; background: rgba(255, 235, 225, 0.15); border: none; }
 
         @keyframes scrollDanmaku {
-            0% { transform: translateX(100vw); opacity: 0.4; }
+            0% { transform: translateX(100vw) translateZ(0); opacity: 0.4; }
             10% { opacity: 1; }
             90% { opacity: 1; }
-            100% { transform: translateX(-450px); opacity: 0; }
+            100% { transform: translateX(-450px) translateZ(0); opacity: 0; }
         }
 
         /* ---------- 烟花画布 ---------- */
@@ -175,6 +196,8 @@
             border: 1px solid rgba(255, 255, 255, 0.3);
             letter-spacing: 2px;
             text-shadow: 0 0 8px rgba(255, 100, 100, 0.4);
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         .hint-click {
@@ -191,17 +214,23 @@
             pointer-events: none;
             border: 1px solid rgba(255, 255, 255, 0.3);
             text-shadow: 0 0 8px rgba(255, 100, 100, 0.4);
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
-        /* 响应式 */
+        /* 响应式 - 小屏幕爱心自适应 */
         @media (max-width: 600px) {
             .real-heart { width: 180px; height: 180px; }
+            .danmaku { font-size: 18px; padding: 4px 12px; }
+            .danmaku.slow { font-size: 16px; }
+            .danmaku.medium { font-size: 20px; }
+            .danmaku.xlarge { font-size: 24px; }
         }
     </style>
 </head>
 <body>
     <div class="magic-stage" id="clickZone">
-        <!-- SVG一笔爱心（完美曲线） -->
+        <!-- SVG爱心 -->
         <div class="heart-box" id="heart">
             <div class="real-heart" style="width:240px; height:240px;">
                 <svg viewBox="80 190 500 120" width="240" height="240">
@@ -241,7 +270,7 @@
 
         <!-- 装饰文字 -->
         <div class="signature">💗 蔡珍妮，永远幸福 💗</div>
-        <div class="hint-click">✨ 点击爱心，燃放专属于你的烟花 ✨</div>
+        <div class="hint-click">✨ 点击爱心，看看会发生什么 ✨</div>
     </div>
 
     <script>
@@ -254,7 +283,7 @@
                 if (!starContainer) return;
                 starContainer.innerHTML = '';
 
-                const starCount = 24; 
+                const starCount = 20; // 稍微减少星星数量
                 const w = window.innerWidth;
                 const h = window.innerHeight;
 
@@ -290,7 +319,7 @@
                 }
             }
 
-            // ---------- 2. 弹幕（无重叠优化）----------
+            // ---------- 2. 弹幕（降低密度，避免重叠）----------
             function initDanmaku() {
                 const container = document.getElementById('danmakuContainer');
                 if (!container) return;
@@ -329,9 +358,10 @@
                     "蔡珍妮，最好的祝福给你 🎉"
                 ];
 
-                // 弹幕数量38条，均分纵向空间避免重叠
-                const danmakuCount = 38; 
-                const segmentHeight = 100 / danmakuCount; // 百分比
+                // 降低弹幕密度：从38条减少到22条
+                const danmakuCount = 22; 
+                // 纵向分成22个区域，每个区域高度更大，避免重叠
+                const segmentHeight = 100 / danmakuCount;
 
                 for (let i = 0; i < danmakuCount; i++) {
                     const dan = document.createElement('div');
@@ -347,14 +377,15 @@
                     
                     if (Math.random() > 0.7) dan.classList.add('xlarge');
 
-                    // 纵向均分 + 微小偏移
-                    const basePos = i * segmentHeight;
-                    const offset = (Math.random() - 0.5) * segmentHeight * 0.5;
+                    // 纵向均分 + 微小偏移（偏移量减小，避免越界重叠）
+                    const basePos = i * segmentHeight + segmentHeight / 2; // 取每个区域的中点
+                    const offset = (Math.random() - 0.5) * segmentHeight * 0.3; // 偏移范围缩小
                     let topPos = basePos + offset;
-                    topPos = Math.min(98, Math.max(2, topPos));
+                    topPos = Math.min(95, Math.max(5, topPos)); // 保持在屏幕内
                     dan.style.top = topPos + '%';
                     
-                    const delay = Math.random() * 2.5;
+                    // 增加延迟随机范围，让弹幕更分散
+                    const delay = Math.random() * 5; // 0-5秒延迟
                     dan.style.animationDelay = delay + 's';
                     
                     dan.style.color = `rgba(255, 255, 255, ${0.92 + Math.random() * 0.08})`;
