@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>蔡珍妮永远幸福</title>
+    <style>
+        /* ---------- 全局奶油粉氛围 ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 30%, #ffecf0, #ffe1e6);
+            font-family: 'Quicksand', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .magic-stage {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* ---------- SVG爱心容器 ---------- */
+        .heart-box {
+            position: relative;
+            z-index: 50;
+            animation: lovely-beat 1.3s infinite cubic-bezier(0.5, 0.1, 0.3, 1.5);
+            transform-origin: center;
+        }
+
+        .real-heart {
+            width: 240px;
+            height: 240px;
+        }
+
+        .real-heart svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 15px 25px rgba(255, 170, 180, 0.35));
+        }
+
+        /* 心跳动画 */
+        @keyframes lovely-beat {
+            0% { transform: scale(1); }
+            15% { transform: scale(1.12); }
+            28% { transform: scale(1.2); }
+            40% { transform: scale(1.08); }
+            55% { transform: scale(1); }
+            70% { transform: scale(0.98); }
+            85% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+
+        /* ---------- 散落的星星 ---------- */
+        .scattered-stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 20;
+        }
+
+        .star {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.98);
+            font-size: 26px;
+            text-shadow: 0 0 20px #ffcfb0, 0 0 45px #ffb7b7;
+            animation: float-shine 4s infinite alternate ease-in-out;
+            white-space: nowrap;
+            filter: drop-shadow(0 0 8px #ffc2b3);
+            opacity: 0.9;
+        }
+
+        .star-small {
+            font-size: 18px;
+            opacity: 0.85;
+            text-shadow: 0 0 18px #ffe1b5;
+        }
+
+        .star-large {
+            font-size: 34px;
+            text-shadow: 0 0 35px #ffded4, 0 0 70px #ffb1b1;
+        }
+
+        @keyframes float-shine {
+            0% { transform: translateY(0px) scale(0.95); opacity: 0.6; }
+            100% { transform: translateY(-20px) scale(1.2); opacity: 1; text-shadow: 0 0 35px #ffe8cf, 0 0 80px #ffa7aa; }
+        }
+
+        /* ---------- 白色弹幕（无重叠优化版） ---------- */
+        .danmaku-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+            overflow: hidden;
+        }
+
+        .danmaku {
+            position: absolute;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 22px;
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-shadow: 0 0 12px rgba(255, 150, 150, 0.6);
+            background: rgba(255, 235, 230, 0.2);
+            padding: 6px 18px;
+            border-radius: 50px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(255, 200, 200, 0.2);
+            animation: scrollDanmaku linear infinite;
+            z-index: 15;
+            font-family: 'Microsoft YaHei', 'Quicksand', sans-serif;
+            pointer-events: none;
+            transform: translateX(100vw);
+            animation-fill-mode: forwards;
+        }
+
+        .danmaku.slow { animation-duration: 28s; font-size: 20px; }
+        .danmaku.medium { animation-duration: 20s; font-size: 26px; }
+        .danmaku.fast { animation-duration: 15s; font-size: 18px; }
+        .danmaku.xlarge { font-size: 32px; animation-duration: 35s; background: rgba(255, 235, 225, 0.15); border: none; }
+
+        @keyframes scrollDanmaku {
+            0% { transform: translateX(100vw); opacity: 0.4; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateX(-450px); opacity: 0; }
+        }
+
+        /* ---------- 烟花画布 ---------- */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* 落款 */
+        .signature {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            color: #ffffff;
+            font-size: 15px;
+            background: rgba(255, 200, 200, 0.25);
+            padding: 6px 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            z-index: 60;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(255, 100, 100, 0.4);
+        }
+
+        .hint-click {
+            position: absolute;
+            bottom: 20px;
+            left: 30px;
+            color: #ffffff;
+            font-size: 15px;
+            background: rgba(255, 200, 200, 0.25);
+            padding: 6px 24px;
+            border-radius: 50px;
+            backdrop-filter: blur(4px);
+            z-index: 60;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0 8px rgba(255, 100, 100, 0.4);
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .real-heart { width: 180px; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="magic-stage" id="clickZone">
+        <!-- SVG一笔爱心（完美曲线） -->
+        <div class="heart-box" id="heart">
+            <div class="real-heart" style="width:240px; height:240px;">
+                <svg viewBox="80 190 500 120" width="240" height="240">
+                    <defs>
+                        <!-- 奶油粉渐变 -->
+                        <radialGradient id="heartGradient" cx="35%" cy="30%" r="70%">
+                            <stop offset="0%" stop-color="#ffe6ea"/>
+                            <stop offset="60%" stop-color="#ffc1c8"/>
+                            <stop offset="100%" stop-color="#ff9fad"/>
+                        </radialGradient>
+                        <!-- 柔和高光 -->
+                        <radialGradient id="highlight" cx="50%" cy="0%" r="60%">
+                            <stop offset="0%" stop-color="rgba(255,255,255,0.7)"/>
+                            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                        </radialGradient>
+                    </defs>
+                    <!-- 经典一笔爱心路径 -->
+                    <path 
+                        d="M256 464s-176-104-176-232c0-66 54-120 120-120
+                           44 0 84 24 104 60
+                           20-36 60-60 104-60
+                           66 0 120 54 120 120
+                           0 128-176 232-176 232z"
+                        fill="url(#heartGradient)"/>
+                    <!-- 顶部高光 -->
+                    <ellipse cx="260" cy="160" rx="90" ry="60" fill="url(#highlight)" opacity="0.6"/>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 散落星星容器 -->
+        <div class="scattered-stars" id="starField"></div>
+        <!-- 弹幕容器 -->
+        <div class="danmaku-screen" id="danmakuContainer"></div>
+        <!-- 烟花canvas -->
+        <canvas id="fireworks-canvas"></canvas>
+
+        <!-- 装饰文字 -->
+        <div class="signature">💗 蔡珍妮，永远幸福 💗</div>
+        <div class="hint-click">✨ 点击爱心，燃放专属于你的烟花 ✨</div>
+    </div>
+
+    <script>
+        (function() {
+            "use strict";
+
+            // ---------- 1. 散落的星星 ----------
+            function initStars() {
+                const starContainer = document.getElementById('starField');
+                if (!starContainer) return;
+                starContainer.innerHTML = '';
+
+                const starCount = 24; 
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+
+                for (let i = 0; i < starCount; i++) {
+                    const star = document.createElement('span');
+                    star.className = 'star';
+                    
+                    if (i % 3 === 0) star.classList.add('star-large');
+                    else if (i % 3 === 1) star.classList.add('star-small');
+                    
+                    const rand = Math.random();
+                    if (rand < 0.33) star.innerHTML = '⭐';
+                    else if (rand < 0.66) star.innerHTML = '✨';
+                    else star.innerHTML = '🌟';
+
+                    let x, y;
+                    const centerX = w / 2, centerY = h / 2 - 10;
+                    // 避开爱心区域
+                    do {
+                        x = Math.random() * w;
+                        y = Math.random() * h;
+                    } while (Math.abs(x - centerX) < 170 && Math.abs(y - centerY) < 160);
+
+                    star.style.left = x + 'px';
+                    star.style.top = y + 'px';
+                    
+                    const delay = Math.random() * 5;
+                    star.style.animationDelay = delay + 's';
+                    star.style.animationDuration = (3 + Math.random() * 4) + 's';
+                    star.style.transform = `rotate(${Math.random() * 30}deg)`;
+                    
+                    starContainer.appendChild(star);
+                }
+            }
+
+            // ---------- 2. 弹幕（无重叠优化）----------
+            function initDanmaku() {
+                const container = document.getElementById('danmakuContainer');
+                if (!container) return;
+                container.innerHTML = '';
+
+                const messages = [
+                    "蔡珍妮，我爱你 💕",
+                    "蔡珍妮，希望你一辈子幸福 🌹",
+                    "蔡珍妮，你是最温柔的星光 ✨",
+                    "蔡珍妮，每天都要开心呀 🍰",
+                    "蔡珍妮，遇见你是奇迹 🎀",
+                    "蔡珍妮，我的奶油女孩 🍦",
+                    "蔡珍妮，想和你一起看星星 🌠",
+                    "蔡珍妮，永远做你的后盾 🛡️",
+                    "蔡珍妮，这世界因你而甜 🍬",
+                    "蔡珍妮，你的笑容像春风 🌸",
+                    "蔡珍妮，陪你走过每个四季 🍂",
+                    "蔡珍妮，你是心之所向 💘",
+                    "蔡珍妮，要一直幸福下去 🕊️",
+                    "蔡珍妮，我最喜欢你了 💗",
+                    "蔡珍妮，愿你被世界温柔以待 🌏",
+                    "蔡珍妮，你比奶油更甜美 🧁",
+                    "蔡珍妮，今天也很想你 💭",
+                    "蔡珍妮，我们永远在一起 👩‍❤️‍💋‍👩",
+                    "蔡珍妮，晚安和早安 🌙☀️",
+                    "蔡珍妮，谢谢你来到我身边 🎁",
+                    "蔡珍妮，爱你不是两三天 💞",
+                    "蔡珍妮，想和你环游世界 ✈️",
+                    "蔡珍妮，你让平凡发光 ✨",
+                    "蔡珍妮，一辈子守护你 🕯️",
+                    "蔡珍妮，做你永远的星星 ⭐",
+                    "蔡珍妮，今天比昨天更爱你 📈",
+                    "蔡珍妮，所有美好都给你 🎐",
+                    "蔡珍妮，你是我奶油色的梦 🥛",
+                    "蔡珍妮，心跳都是你 💓",
+                    "蔡珍妮，最好的祝福给你 🎉"
+                ];
+
+                // 弹幕数量38条，均分纵向空间避免重叠
+                const danmakuCount = 38; 
+                const segmentHeight = 100 / danmakuCount; // 百分比
+
+                for (let i = 0; i < danmakuCount; i++) {
+                    const dan = document.createElement('div');
+                    dan.className = 'danmaku';
+
+                    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                    dan.textContent = randomMsg;
+
+                    const speedType = Math.random();
+                    if (speedType < 0.33) dan.classList.add('slow');
+                    else if (speedType < 0.66) dan.classList.add('medium');
+                    else dan.classList.add('fast');
+                    
+                    if (Math.random() > 0.7) dan.classList.add('xlarge');
+
+                    // 纵向均分 + 微小偏移
+                    const basePos = i * segmentHeight;
+                    const offset = (Math.random() - 0.5) * segmentHeight * 0.5;
+                    let topPos = basePos + offset;
+                    topPos = Math.min(98, Math.max(2, topPos));
+                    dan.style.top = topPos + '%';
+                    
+                    const delay = Math.random() * 2.5;
+                    dan.style.animationDelay = delay + 's';
+                    
+                    dan.style.color = `rgba(255, 255, 255, ${0.92 + Math.random() * 0.08})`;
+                    dan.style.background = `rgba(255, 235, 230, ${0.1 + Math.random() * 0.1})`;
+                    
+                    container.appendChild(dan);
+                }
+            }
+
+            // ---------- 3. 重置布局 ----------
+            function resetLayout() {
+                initStars();
+                initDanmaku();
+            }
+
+            // ---------- 4. 烟花系统 ----------
+            const canvas = document.getElementById('fireworks-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let fireworksActive = false;
+            let animFrame = null;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const heart = document.getElementById('heart');
+
+            function launchFireworks(e) {
+                e.stopPropagation();
+                let rect = heart.getBoundingClientRect();
+                let x = rect.left + rect.width / 2;
+                let y = rect.top + rect.height / 2;
+                if (e.clientX && e.clientY) {
+                    x = e.clientX;
+                    y = e.clientY;
+                }
+
+                // 连续烟花
+                createFireworkBurst(x, y);
+                setTimeout(() => { createFireworkBurst(x - 30, y - 20); }, 100);
+                setTimeout(() => { createFireworkBurst(x + 40, y + 10); }, 200);
+                setTimeout(() => { createFireworkBurst(x - 20, y + 40); }, 300);
+                setTimeout(() => { createFireworkBurst(x + 30, y - 30); }, 400);
+            }
+
+            function createFireworkBurst(x, y) {
+                const colors = ['#FFDDC4', '#FFE4D6', '#FFD9C0', '#FFC4C0', '#FFB6B9', '#FFE0B2', '#FFD2B0', '#FFEAD2'];
+                const count = 65 + Math.floor(Math.random() * 45);
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * 2 * Math.PI;
+                    const speed = 3.5 + Math.random() * 10;
+                    const vx = Math.cos(angle) * speed * (0.6 + Math.random() * 0.6);
+                    const vy = Math.sin(angle) * speed * (0.6 + Math.random() * 0.6);
+                    const size = 6 + Math.random() * 14;
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    particles.push({
+                        x, y, vx, vy,
+                        size,
+                        color,
+                        alpha: 0.9,
+                        life: 0.95 + Math.random() * 0.2,
+                        decay: 0.012 + Math.random() * 0.014,
+                    });
+                }
+
+                if (!fireworksActive) {
+                    fireworksActive = true;
+                    animateFireworks();
+                }
+            }
+
+            function animateFireworks() {
+                if (!fireworksActive) return;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let hasAlive = false;
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.045;
+                    p.vx *= 0.992;
+                    p.vy *= 0.992;
+                    p.life -= p.decay;
+                    p.alpha = p.life * 0.8;
+
+                    if (p.life <= 0.02 || p.x < -50 || p.x > canvas.width + 50 || p.y < -50 || p.y > canvas.height + 50) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    hasAlive = true;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * p.life * 0.7, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = '#FFF1E0';
+                    ctx.shadowBlur = 16 * p.life;
+                    ctx.globalAlpha = p.alpha * 0.9;
+                    ctx.fill();
+                    
+                    ctx.shadowBlur = 20;
+                    ctx.fillStyle = '#FFFEF9';
+                    ctx.globalAlpha = p.alpha * 0.4;
+                    ctx.arc(p.x - 1, p.y - 1, p.size * p.life * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+
+                if (hasAlive) {
+                    animFrame = requestAnimationFrame(animateFireworks);
+                } else {
+                    fireworksActive = false;
+                    cancelAnimationFrame(animFrame);
+                    animFrame = null;
+                }
+            }
+
+            heart.addEventListener('click', launchFireworks);
+
+            // 初始化
+            window.addEventListener('load', () => {
+                resetLayout();
+            });
+
+            resetLayout();
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    resetLayout();
+                }, 150);
+            });
+        })();
+    </script>
+
+    <noscript>
+        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; font-size:30px; text-shadow:0 0 20px #ff9e9e;">❤️ 蔡珍妮，我爱你 ❤️</div>
+    </noscript>
+</body>
+</html>
